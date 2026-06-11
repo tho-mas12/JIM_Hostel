@@ -274,6 +274,45 @@ def manage_accounts(current_user):
         
         return jsonify({'message': 'User account created successfully'}), 201
 
+@app.route('/api/accounts/<username>', methods=['PUT', 'DELETE'])
+@token_required
+@roles_required('Admin')
+def modify_account(current_user, username):
+    db = get_db()
+    if request.method == 'PUT':
+        data = request.json
+        name = data.get('name')
+        email = data.get('email')
+        role = data.get('role')
+        
+        if not name or not email or not role:
+            return jsonify({'message': 'All fields are required'}), 400
+            
+        result = db["users"].update_one(
+            {"username": username},
+            {"$set": {
+                "name": name,
+                "email": email,
+                "role": role
+            }}
+        )
+        if result.matched_count == 0:
+            return jsonify({'message': 'User not found'}), 404
+            
+        log_action(current_user['_id'], current_user['username'], "Update User", f"Updated user account: {username}")
+        return jsonify({'message': 'User account updated successfully'})
+        
+    if request.method == 'DELETE':
+        if current_user['username'] == username:
+            return jsonify({'message': 'Cannot delete your own administrative account'}), 400
+            
+        result = db["users"].delete_one({"username": username})
+        if result.deleted_count == 0:
+            return jsonify({'message': 'User not found'}), 404
+            
+        log_action(current_user['_id'], current_user['username'], "Delete User", f"Deleted user account: {username}")
+        return jsonify({'message': 'User account deleted successfully'})
+
 # =====================================================================
 # ROOM MANAGEMENT
 # =====================================================================

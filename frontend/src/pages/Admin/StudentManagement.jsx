@@ -65,15 +65,18 @@ const StudentManagement = () => {
 
   const handleAddSubmit = async (e) => {
     e.preventDefault();
-    if (!studentId || !name || !roomNumber || !mobile) {
+    if (!name || !roomNumber || !mobile) {
       showToast('Please fill in all required fields', 'warning');
       return;
     }
 
+    // Auto-generate unique student ID (JIM + timestamp + random digit)
+    const generatedId = 'JIM' + Date.now().toString().slice(-7) + Math.floor(Math.random() * 10);
+
     try {
       await API.post('/students', {
-        student_id: studentId,
-        register_number: studentId,
+        student_id: generatedId,
+        register_number: generatedId,
         name,
         course,
         year,
@@ -300,18 +303,6 @@ const StudentManagement = () => {
             </div>
 
             <form onSubmit={handleAddSubmit} className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs font-semibold">
-              <div>
-                <label className="block text-xs font-bold text-gray-500 uppercase mb-2">Student ID *</label>
-                <input
-                  type="text"
-                  value={studentId}
-                  onChange={(e) => setStudentId(e.target.value)}
-                  placeholder="e.g. JIM2620002"
-                  className="w-full px-4.5 py-2.5 bg-gray-50 border border-gray-100 rounded-xl focus:outline-none"
-                  required
-                />
-              </div>
-
               <div className="sm:col-span-2">
                 <label className="block text-xs font-bold text-gray-500 uppercase mb-2">Student Full Name *</label>
                 <input

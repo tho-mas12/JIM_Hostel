@@ -254,5 +254,29 @@
     "action": "Login",
     "details": "User successfully logged into the system",
     "timestamp": "2026-06-11T13:29:20.621323"
+  },
+  {
+    "_id": "1781165149.10126",
+    "user_id": "user_admin",
+    "username": "admin",
+    "action": "Login",
+    "details": "User successfully logged into the system",
+    "timestamp": "2026-06-11T13:35:49.101260"
+  },
+  {
+    "_id": "1781165314.358271",
+    "user_id": "user_admin",
+    "username": "admin",
+    "action": "Create User",
+    "details": "Created AD account: ajay",
+    "timestamp": "2026-06-11T13:38:34.358271"
+  },
+  {
+    "_id": "1781165327.874378",
+    "user_id": "user_ajay",
+    "username": "ajay",
+    "action": "Login",
+    "details": "User successfully logged into the system",
+    "timestamp": "2026-06-11T13:38:47.874378"
   }
 ]

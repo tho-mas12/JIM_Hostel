@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import API from '../../api';
 import { useToast } from '../../context/ToastContext';
-import { UserPlus, Key, Eye, EyeOff, X, User, Mail, ShieldAlert } from 'lucide-react';
+import { UserPlus, Key, Eye, EyeOff, X, User, Mail, ShieldAlert, Edit, Trash } from 'lucide-react';
 
 const UserAccounts = () => {
   const { showToast } = useToast();
@@ -10,8 +10,51 @@ const UserAccounts = () => {
 
   // Modal controls
   const [showAddModal, setShowAddModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
   const [showResetModal, setShowResetModal] = useState(false);
   const [selectedUsername, setSelectedUsername] = useState('');
+
+  const handleEditClick = (acc) => {
+    setSelectedUsername(acc.username);
+    setName(acc.name);
+    setEmail(acc.email);
+    setRole(acc.role);
+    setShowEditModal(true);
+  };
+
+  const handleEditSubmit = async (e) => {
+    e.preventDefault();
+    if (!name || !email || !role) {
+      showToast('Please fill in all fields', 'warning');
+      return;
+    }
+
+    try {
+      await API.put(`/accounts/${selectedUsername}`, {
+        name,
+        email,
+        role
+      });
+      showToast('User account updated successfully!', 'success');
+      setShowEditModal(false);
+      resetAddForm();
+      fetchAccounts();
+    } catch (error) {
+      showToast(error.response?.data?.message || 'Failed to update user account', 'error');
+    }
+  };
+
+  const handleDeleteClick = async (username) => {
+    if (window.confirm(`Are you sure you want to delete staff account: ${username}? This cannot be undone.`)) {
+      try {
+        await API.delete(`/accounts/${username}`);
+        showToast('User account deleted successfully', 'success');
+        fetchAccounts();
+      } catch (error) {
+        showToast(error.response?.data?.message || 'Failed to delete user account', 'error');
+      }
+    }
+  };
 
   // Add User Form
   const [username, setUsername] = useState('');
@@ -155,12 +198,29 @@ const UserAccounts = () => {
                       {acc.created_at ? new Date(acc.created_at).toLocaleDateString() : '—'}
                     </td>
                     <td className="p-4">
-                      <button
-                        onClick={() => { setSelectedUsername(acc.username); setShowResetModal(true); }}
-                        className="flex items-center gap-1.5 px-3 py-1.5 border border-gray-100 hover:border-blue-200 text-gray-500 hover:text-primary hover:bg-blue-50/30 rounded-lg transition-all font-bold"
-                      >
-                        <Key className="w-3.5 h-3.5 text-amber-500" /> Reset Password
-                      </button>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => handleEditClick(acc)}
+                          className="p-1.5 rounded-lg border border-gray-100 hover:border-blue-200 text-gray-500 hover:text-primary hover:bg-blue-50/30 transition-all"
+                          title="Edit Account Details"
+                        >
+                          <Edit className="w-3.5 h-3.5 text-blue-500" />
+                        </button>
+                        <button
+                          onClick={() => { setSelectedUsername(acc.username); setShowResetModal(true); }}
+                          className="p-1.5 rounded-lg border border-gray-100 hover:border-amber-200 text-gray-500 hover:text-amber-600 hover:bg-amber-50/30 transition-all"
+                          title="Reset Password"
+                        >
+                          <Key className="w-3.5 h-3.5 text-amber-500" />
+                        </button>
+                        <button
+                          onClick={() => handleDeleteClick(acc.username)}
+                          className="p-1.5 rounded-lg border border-gray-100 hover:border-red-200 text-gray-500 hover:text-rose-600 hover:bg-rose-50/30 transition-all"
+                          title="Delete Account"
+                        >
+                          <Trash className="w-3.5 h-3.5 text-rose-500" />
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))
@@ -337,6 +397,86 @@ const UserAccounts = () => {
                   className="px-6 py-2.5 bg-primary hover:bg-primary-hover text-white rounded-xl font-bold text-xs shadow-md"
                 >
                   Save New Password
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Edit User Modal */}
+      {showEditModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm animate-fade-in px-4">
+          <div className="bg-white rounded-3xl p-6 max-w-md w-full border border-gray-100 shadow-2xl scale-enter">
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="font-extrabold text-gray-800 text-md">Edit Staff Profile</h3>
+              <button onClick={() => setShowEditModal(false)} className="p-1 rounded-lg hover:bg-gray-100 text-gray-400">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleEditSubmit} className="space-y-4 text-xs font-semibold">
+              <div>
+                <label className="block text-xs font-bold text-gray-500 uppercase mb-2">Display Name *</label>
+                <div className="relative">
+                  <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
+                    <User className="w-4 h-4" />
+                  </span>
+                  <input
+                    type="text"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    placeholder="e.g. Mr. Darwin"
+                    className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-100 rounded-xl focus:outline-none"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-gray-500 uppercase mb-2">Email Address *</label>
+                <div className="relative">
+                  <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
+                    <Mail className="w-4 h-4" />
+                  </span>
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="e.g. darwin@jim.edu"
+                    className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-100 rounded-xl focus:outline-none"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-gray-500 uppercase mb-2">Role Access *</label>
+                <select
+                  value={role}
+                  onChange={(e) => setRole(e.target.value)}
+                  className="w-full px-4 py-2.5 bg-gray-50 border border-gray-100 rounded-xl focus:outline-none cursor-pointer"
+                  required
+                >
+                  <option value="AD">Assistant Director (AD)</option>
+                  <option value="Director">Hostel Director</option>
+                  <option value="Admin">System Admin</option>
+                </select>
+              </div>
+
+              <div className="flex justify-end gap-3 border-t border-gray-50 pt-4 mt-2">
+                <button
+                  type="button"
+                  onClick={() => setShowEditModal(false)}
+                  className="px-4 py-2.5 border border-gray-100 rounded-xl font-bold text-xs text-gray-600 hover:bg-gray-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-6 py-2.5 bg-primary hover:bg-primary-hover text-white rounded-xl font-bold text-xs"
+                >
+                  Save Changes
                 </button>
               </div>
             </form>
