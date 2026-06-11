@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import fwtLogo from '../assets/fwt_logo.png';
 
 const Footer = () => {
   return (
@@ -31,26 +32,7 @@ const Footer = () => {
           {/* FrontierWox Logo Badge */}
           <div className="flex items-center gap-3 bg-black/20 px-3 py-1.5 rounded-xl border border-gray-800/40">
             {/* Logo Icon */}
-            <div className="relative w-8 h-8 flex items-center justify-center">
-              <svg viewBox="0 0 100 100" fill="none" className="w-8 h-8">
-                {/* Left Wing (Orange/Gold) */}
-                <path d="M15,20 C35,20 50,35 50,55 C50,75 35,90 15,90 C25,75 35,55 35,35 Z" fill="url(#orangeGrad)" />
-                {/* Right Wing (Blue/Azure) */}
-                <path d="M85,20 C65,20 50,35 50,55 C50,75 65,90 85,90 C75,75 65,55 65,35 Z" fill="url(#blueGrad)" />
-                {/* Central Spark */}
-                <circle cx="50" cy="55" r="8" fill="#FFFFFF" />
-                <defs>
-                  <linearGradient id="orangeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stopColor="#F97316" />
-                    <stop offset="100%" stopColor="#FACC15" />
-                  </linearGradient>
-                  <linearGradient id="blueGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stopColor="#2563EB" />
-                    <stop offset="100%" stopColor="#38BDF8" />
-                  </linearGradient>
-                </defs>
-              </svg>
-            </div>
+            <img src={fwtLogo} alt="FrontierWox Logo" className="h-8 object-contain" />
             
             {/* Divider Line */}
             <div className="h-6 w-[1px] bg-gray-700/60" />
