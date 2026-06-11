@@ -1,0 +1,67 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-gray-50/50 text-gray-800 antialiased font-sans selection:bg-blue-100 selection:text-blue-900;
+    font-family: 'Outfit', sans-serif;
+  }
+}
+
+/* Custom Webkit Scrollbar */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+::-webkit-scrollbar-track {
+  @apply bg-transparent;
+}
+::-webkit-scrollbar-thumb {
+  @apply bg-gray-200 rounded-full hover:bg-gray-300 transition-colors;
+}
+
+/* Premium Component Classes */
+.premium-card {
+  @apply bg-white rounded-2xl border border-gray-100 shadow-sm transition-all duration-300 hover:shadow-md hover:border-gray-200/80;
+}
+
+.premium-card-active {
+  @apply bg-white rounded-2xl border-2 border-primary/20 shadow-md transition-all duration-300;
+}
+
+.glow-btn {
+  @apply relative overflow-hidden transition-all duration-300 hover:brightness-[1.05] active:scale-[0.98] shadow-sm hover:shadow-md;
+}
+
+.glow-btn-success {
+  @apply bg-success text-white hover:shadow-success/20;
+}
+
+.glow-btn-primary {
+  @apply bg-primary text-white hover:shadow-primary/20;
+}
+
+/* Animation Utilities */
+.page-enter {
+  @apply animate-fade-in animate-slide-up;
+}
+
+.scale-enter {
+  @apply animate-scale-in;
+}
+
+/* Available Room Bed Dot Animation */
+.bed-dot {
+  @apply w-3 h-3 rounded-full transition-all duration-300;
+}
+
+.bed-dot-occupied {
+  @apply bg-danger/20 border border-danger;
+}
+
+.bed-dot-available {
+  @apply bg-success/20 border border-success animate-pulse-subtle;
+}

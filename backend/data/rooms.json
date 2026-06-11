@@ -1,0 +1,106 @@
+[
+  {
+    "_id": "A1",
+    "block": "Toulouse Arena",
+    "floor": 1,
+    "capacity": 7,
+    "occupied": 7,
+    "available_beds": 0
+  },
+  {
+    "_id": "A2",
+    "block": "Toulouse Arena",
+    "floor": 1,
+    "capacity": 6,
+    "occupied": 6,
+    "available_beds": 0
+  },
+  {
+    "_id": "A3",
+    "block": "Toulouse Arena",
+    "floor": 1,
+    "capacity": 6,
+    "occupied": 6,
+    "available_beds": 0
+  },
+  {
+    "_id": "A4",
+    "block": "Toulouse Arena",
+    "floor": 1,
+    "capacity": 6,
+    "occupied": 6,
+    "available_beds": 0
+  },
+  {
+    "_id": "A5",
+    "block": "Toulouse Arena",
+    "floor": 1,
+    "capacity": 6,
+    "occupied": 6,
+    "available_beds": 0
+  },
+  {
+    "_id": "A6",
+    "block": "Toulouse Arena",
+    "floor": 1,
+    "capacity": 6,
+    "occupied": 6,
+    "available_beds": 0
+  },
+  {
+    "_id": "B1",
+    "block": "Toulouse Arena",
+    "floor": 2,
+    "capacity": 6,
+    "occupied": 6,
+    "available_beds": 0
+  },
+  {
+    "_id": "B2",
+    "block": "Toulouse Arena",
+    "floor": 2,
+    "capacity": 6,
+    "occupied": 6,
+    "available_beds": 0
+  },
+  {
+    "_id": "B3",
+    "block": "Toulouse Arena",
+    "floor": 2,
+    "capacity": 6,
+    "occupied": 6,
+    "available_beds": 0
+  },
+  {
+    "_id": "B4",
+    "block": "Toulouse Arena",
+    "floor": 2,
+    "capacity": 8,
+    "occupied": 8,
+    "available_beds": 0
+  },
+  {
+    "_id": "B5",
+    "block": "Toulouse Arena",
+    "floor": 2,
+    "capacity": 8,
+    "occupied": 7,
+    "available_beds": 1
+  },
+  {
+    "_id": "B6",
+    "block": "Toulouse Arena",
+    "floor": 2,
+    "capacity": 6,
+    "occupied": 4,
+    "available_beds": 2
+  },
+  {
+    "_id": "B8",
+    "block": "Toulouse Arena",
+    "floor": 2,
+    "capacity": 6,
+    "occupied": 5,
+    "available_beds": 1
+  }
+]
