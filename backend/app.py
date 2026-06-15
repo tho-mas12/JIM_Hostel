@@ -13,6 +13,10 @@ from reports_generator import generate_pdf_report, generate_excel_report
 load_dotenv()
 
 app = Flask(__name__)
+
+@app.route('/health')
+def health():
+    return{"status": "ok"}
 # Enable CORS for frontend communications
 CORS(app, resources={r"/api/*": {"origins": "*"}})
 

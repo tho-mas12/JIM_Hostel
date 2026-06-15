@@ -278,5 +278,29 @@
     "action": "Login",
     "details": "User successfully logged into the system",
     "timestamp": "2026-06-11T13:38:47.874378"
+  },
+  {
+    "_id": "1781167575.158345",
+    "user_id": "user_admin",
+    "username": "admin",
+    "action": "Login",
+    "details": "User successfully logged into the system",
+    "timestamp": "2026-06-11T14:16:15.158345"
+  },
+  {
+    "_id": "1781167575.695191",
+    "user_id": "user_admin",
+    "username": "admin",
+    "action": "Create User",
+    "details": "Created AD account: test_user",
+    "timestamp": "2026-06-11T14:16:15.695191"
+  },
+  {
+    "_id": "1781167575.746332",
+    "user_id": "user_admin",
+    "username": "admin",
+    "action": "Delete User",
+    "details": "Deleted user account: test_user",
+    "timestamp": "2026-06-11T14:16:15.746332"
   }
 ]
