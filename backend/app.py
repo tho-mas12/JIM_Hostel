@@ -645,7 +645,51 @@ def mark_attendance(current_user):
             check_continuous_absences(s_id, student['name'], room_number)
             
     log_action(current_user['_id'], current_user['username'], "Mark Attendance", f"Marked {att_type} attendance for Room {room_number} on {date_str}")
-    return jsonify({'message': f"Attendance for Room {room_number} marked successfully!"})
+    return jsonify({'message': 'Attendance saved successfully.'})
+
+@app.route('/api/attendance/<att_id>', methods=['PUT'])
+@token_required
+@roles_required('AD', 'Admin')
+def update_attendance_record(current_user, att_id):
+    data = request.json
+    new_status = data.get('status')
+    new_remarks = data.get('remarks', "")
+    
+    if not new_status:
+        return jsonify({'message': 'Status is required.'}), 400
+        
+    db = get_db()
+    record = db["attendance"].find_one({"_id": att_id})
+    if not record:
+        return jsonify({'message': 'Attendance record not found.'}), 404
+        
+    db["attendance"].update_one(
+        {"_id": att_id},
+        {"$set": {
+            "status": new_status,
+            "remarks": new_remarks,
+            "marked_by": f"{current_user['name']} (Edited)",
+            "timestamp": datetime.datetime.now().isoformat()
+        }}
+    )
+    
+    update_student_attendance_percentage(record["student_id"])
+    
+    log_action(
+        current_user['_id'],
+        current_user['username'],
+        "Edit Attendance",
+        f"Edited attendance for student ID {record['student_id']} on date {record['date']} to {new_status}"
+    )
+    
+    return jsonify({
+        'message': 'Attendance record updated successfully.',
+        'record': {
+            '_id': att_id,
+            'status': new_status,
+            'remarks': new_remarks
+        }
+    })
 
 @app.route('/api/attendance/room/<room_number>', methods=['GET'])
 @token_required
@@ -1129,21 +1173,27 @@ def export_reports(current_user):
     report_format = request.args.get('format', 'pdf') # 'pdf' or 'excel'
     report_type = request.args.get('type', 'daily') # 'daily', 'defaulter', 'leave', 'occupancy'
     room_filter = request.args.get('room')
-    date_filter = request.args.get('date', datetime.date.today().isoformat())
     
+    start_date = request.args.get('start_date')
+    end_date = request.args.get('end_date')
+    if not start_date or not end_date:
+        start_date = request.args.get('date', datetime.date.today().isoformat())
+        end_date = start_date
+        
     db = get_db()
     data = []
     
     if report_type == 'daily':
-        # Retrieve attendance details for this date
-        q = {"date": date_filter}
+        # Retrieve attendance details for this date range
+        q = {"date": {"$gte": start_date, "$lte": end_date}}
         if room_filter:
             q["room_number"] = room_filter
             
-        records = list(db["attendance"].find(q).sort("room_number", 1))
+        records = list(db["attendance"].find(q).sort([("date", 1), ("room_number", 1)]))
         for r in records:
             stud = db["students"].find_one({"_id": r["student_id"]})
             data.append({
+                "date": r.get("date", ""),
                 "register_number": stud["register_number"] if stud else "",
                 "name": stud["name"] if stud else "Unknown",
                 "room_number": r["room_number"],
@@ -1194,13 +1244,14 @@ def export_reports(current_user):
                 "available_beds": r["available_beds"]
             })
             
+    date_label = f"{start_date}_to_{end_date}" if start_date != end_date else start_date
     if report_format == 'pdf':
         pdf_bytes = generate_pdf_report(report_type, data)
         return send_file(
             io.BytesIO(pdf_bytes),
             mimetype='application/pdf',
             as_attachment=True,
-            download_name=f"jim_hostel_{report_type}_report_{date_filter}.pdf"
+            download_name=f"jim_hostel_{report_type}_report_{date_label}.pdf"
         )
     elif report_format == 'excel':
         excel_bytes = generate_excel_report(report_type, data)
@@ -1208,7 +1259,7 @@ def export_reports(current_user):
             io.BytesIO(excel_bytes),
             mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
             as_attachment=True,
-            download_name=f"jim_hostel_{report_type}_report_{date_filter}.xlsx"
+            download_name=f"jim_hostel_{report_type}_report_{date_label}.xlsx"
         )
     else:
         return jsonify({'message': 'Invalid format selection'}), 400

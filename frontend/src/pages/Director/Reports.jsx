@@ -8,7 +8,8 @@ const Reports = () => {
   const [rooms, setRooms] = useState([]);
   const [reportType, setReportType] = useState('daily'); // 'daily', 'defaulter', 'leave', 'occupancy'
   const [format, setFormat] = useState('pdf'); // 'pdf' or 'excel'
-  const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
+  const [startDate, setStartDate] = useState(new Date().toISOString().split('T')[0]);
+  const [endDate, setEndDate] = useState(new Date().toISOString().split('T')[0]);
   const [selectedRoom, setSelectedRoom] = useState('');
   const [exporting, setExporting] = useState(false);
 
@@ -31,9 +32,14 @@ const Reports = () => {
     showToast('Preparing your report, please wait...', 'info');
     
     try {
-      let url = `/reports/export?format=${format}&type=${reportType}&date=${date}`;
-      if (selectedRoom && reportType === 'daily') {
-        url += `&room=${selectedRoom}`;
+      let url = `/reports/export?format=${format}&type=${reportType}`;
+      if (reportType === 'daily') {
+        url += `&start_date=${startDate}&end_date=${endDate}`;
+        if (selectedRoom) {
+          url += `&room=${selectedRoom}`;
+        }
+      } else {
+        url += `&date=${startDate}`;
       }
 
       // Fetch file using Axios as a blob response to send JWT headers securely
@@ -45,7 +51,8 @@ const Reports = () => {
       });
       const link = document.createElement('a');
       link.href = window.URL.createObjectURL(blob);
-      link.download = `jim_hostel_${reportType}_report_${date}.${format === 'pdf' ? 'pdf' : 'xlsx'}`;
+      const dateRangeStr = reportType === 'daily' ? `${startDate}_to_${endDate}` : startDate;
+      link.download = `jim_hostel_${reportType}_report_${dateRangeStr}.${format === 'pdf' ? 'pdf' : 'xlsx'}`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -121,17 +128,33 @@ const Reports = () => {
 
           {/* Conditional Filters */}
           {reportType === 'daily' && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 animate-scale-in">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 animate-scale-in">
               <div>
-                <label className="block text-xs font-bold text-gray-500 uppercase mb-2">Target Date</label>
+                <label className="block text-xs font-bold text-gray-500 uppercase mb-2">From Date</label>
                 <div className="relative">
                   <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
                     <Calendar className="w-4 h-4" />
                   </span>
                   <input
                     type="date"
-                    value={date}
-                    onChange={(e) => setDate(e.target.value)}
+                    value={startDate}
+                    onChange={(e) => setStartDate(e.target.value)}
+                    className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-xs font-semibold focus:outline-none"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-gray-500 uppercase mb-2">To Date</label>
+                <div className="relative">
+                  <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
+                    <Calendar className="w-4 h-4" />
+                  </span>
+                  <input
+                    type="date"
+                    value={endDate}
+                    onChange={(e) => setEndDate(e.target.value)}
                     className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-xs font-semibold focus:outline-none"
                     required
                   />

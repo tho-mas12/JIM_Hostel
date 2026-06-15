@@ -71,8 +71,7 @@ def generate_pdf_report(report_type, data):
 
     # Add Title and Headers
     story.append(Paragraph("JIM HOSTEL ATTENDANCE MANAGEMENT SYSTEM", title_style))
-    date_str = datetime.now().strftime("%d-%b-%Y %I:%M %p")
-    story.append(Paragraph(f"Report Type: {report_type.upper()} REPORT | Generated on: {date_str}", subtitle_style))
+    story.append(Paragraph(f"Report Type: {report_type.upper()} REPORT", subtitle_style))
     story.append(Spacer(1, 10))
 
     if not data:
@@ -80,16 +79,16 @@ def generate_pdf_report(report_type, data):
     else:
         # Define table headers based on report type
         if report_type == 'daily':
-            headers = ["Student Name", "Room", "Status", "Marked By", "Time"]
-            col_widths = [2.4*inch, 0.8*inch, 1.0*inch, 2.0*inch, 1.8*inch]
+            headers = ["Date", "Student Name", "Room", "Status", "Marked By"]
+            col_widths = [1.2*inch, 2.3*inch, 0.7*inch, 1.0*inch, 2.2*inch]
             rows = [[Paragraph(h, header_style) for h in headers]]
             for item in data:
                 rows.append([
+                    Paragraph(item.get('date', ''), body_style),
                     Paragraph(item.get('name', ''), body_style),
                     Paragraph(item.get('room_number', ''), body_style),
                     Paragraph(item.get('status', ''), body_style),
-                    Paragraph(item.get('marked_by', ''), body_style),
-                    Paragraph(item.get('time', ''), body_style)
+                    Paragraph(item.get('marked_by', ''), body_style)
                 ])
         elif report_type == 'defaulter':
             headers = ["Student Name", "Room", "Attendance %", "Risk Level"]
@@ -188,8 +187,7 @@ def generate_excel_report(report_type, data):
     
     # Subtitle Row
     ws.merge_cells('A2:F2')
-    date_str = datetime.now().strftime("%d-%b-%Y %I:%M %p")
-    ws['A2'] = f"Report Type: {report_type.upper()} | Generated: {date_str}"
+    ws['A2'] = f"Report Type: {report_type.upper()} REPORT"
     ws['A2'].font = Font(name='Arial', size=10, italic=True, color='4B5563')
     ws['A2'].alignment = center_align
     ws.row_dimensions[2].height = 20
@@ -202,15 +200,15 @@ def generate_excel_report(report_type, data):
     else:
         # Define headers
         if report_type == 'daily':
-            headers = ["Student Name", "Room Number", "Attendance Status", "Marked By", "Timestamp"]
+            headers = ["Date", "Student Name", "Room Number", "Attendance Status", "Marked By"]
             ws.append(headers)
             for item in data:
                 ws.append([
+                    item.get('date', ''),
                     item.get('name', ''),
                     item.get('room_number', ''),
                     item.get('status', ''),
-                    item.get('marked_by', ''),
-                    item.get('time', '')
+                    item.get('marked_by', '')
                 ])
         elif report_type == 'defaulter':
             headers = ["Student Name", "Room Number", "Attendance Percentage", "Risk Level"]

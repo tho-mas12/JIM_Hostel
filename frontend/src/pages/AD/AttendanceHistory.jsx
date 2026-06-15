@@ -9,6 +9,10 @@ const AttendanceHistory = () => {
   const [history, setHistory] = useState([]);
   const [rooms, setRooms] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [editingRecord, setEditingRecord] = useState(null);
+  const [editStatus, setEditStatus] = useState('');
+  const [editRemarks, setEditRemarks] = useState('');
+  const [savingEdit, setSavingEdit] = useState(false);
 
   // Filters
   const [room, setRoom] = useState('');
@@ -86,6 +90,45 @@ const AttendanceHistory = () => {
       (h.remarks && h.remarks.toLowerCase().includes(query))
     );
   });
+
+  const handleEditClick = (record) => {
+    setEditingRecord(record);
+    setEditStatus(record.status);
+    setEditRemarks(record.remarks || '');
+  };
+
+  const handleSaveEdit = async (e) => {
+    e.preventDefault();
+    if (!editStatus) {
+      showToast('Status is required', 'warning');
+      return;
+    }
+    setSavingEdit(true);
+    try {
+      await API.put(`/attendance/${editingRecord._id}`, {
+        status: editStatus,
+        remarks: editRemarks
+      });
+      showToast('Attendance updated successfully!', 'success');
+      // Update state
+      setHistory(prev => prev.map(item => {
+        if (item._id === editingRecord._id) {
+          return {
+            ...item,
+            status: editStatus,
+            remarks: editRemarks,
+            marked_by: `${item.marked_by.split(' (')[0]} (Edited)`
+          };
+        }
+        return item;
+      }));
+      setEditingRecord(null);
+    } catch (err) {
+      showToast(err.response?.data?.message || 'Error updating attendance log', 'error');
+    } finally {
+      setSavingEdit(false);
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -210,6 +253,7 @@ const AttendanceHistory = () => {
                 <th className="p-4">Status</th>
                 <th className="p-4">Remarks</th>
                 <th className="p-4">Marked By</th>
+                <th className="p-4 text-center">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-50 font-medium text-gray-700">
@@ -257,6 +301,14 @@ const AttendanceHistory = () => {
                       <td className="p-4 text-gray-400 font-semibold">
                         {h.marked_by}
                       </td>
+                      <td className="p-4 text-center">
+                        <button
+                          onClick={() => handleEditClick(h)}
+                          className="px-2.5 py-1 text-[10px] font-bold bg-blue-50 text-primary border border-blue-100 rounded-lg hover:bg-primary hover:text-white transition-all active:scale-[0.96]"
+                        >
+                          Edit
+                        </button>
+                      </td>
                     </tr>
                   );
                 })
@@ -265,6 +317,74 @@ const AttendanceHistory = () => {
           </table>
         </div>
       </div>
+
+      {/* Edit Attendance Modal */}
+      {editingRecord && (
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-start justify-center pt-20 overflow-y-auto px-4">
+          <div className="bg-white rounded-3xl w-full max-w-md shadow-2xl border border-gray-100 scale-enter p-6 space-y-4 text-left">
+            <div>
+              <h3 className="font-extrabold text-lg text-gray-800 tracking-tight">Edit Attendance Log</h3>
+              <p className="text-[10px] text-gray-400 font-semibold uppercase mt-0.5">
+                {editingRecord.student_name} • Room {editingRecord.room_number} • {editingRecord.date} ({editingRecord.type})
+              </p>
+            </div>
+
+            <form onSubmit={handleSaveEdit} className="space-y-4">
+              {/* Status Selector */}
+              <div className="space-y-1.5">
+                <label className="block text-xs font-bold text-gray-500 uppercase">Attendance Status</label>
+                <select
+                  value={editStatus}
+                  onChange={(e) => setEditStatus(e.target.value)}
+                  className="w-full px-3 py-2 bg-gray-50 border border-gray-100 rounded-xl text-xs font-semibold focus:outline-none"
+                  required
+                >
+                  <option value="Present">Present</option>
+                  <option value="Absent">Absent</option>
+                  <option value="Leave">Leave</option>
+                  <option value="Late Entry">Late Entry</option>
+                </select>
+              </div>
+
+              {/* Remarks Textarea */}
+              <div className="space-y-1.5">
+                <label className="block text-xs font-bold text-gray-500 uppercase">Remarks / Reason</label>
+                <textarea
+                  value={editRemarks}
+                  onChange={(e) => setEditRemarks(e.target.value)}
+                  placeholder="Optional remarks (e.g. medical reason, late pass)"
+                  className="w-full px-3 py-2 bg-gray-50 border border-gray-100 rounded-xl text-xs font-semibold focus:outline-none min-h-[80px]"
+                />
+              </div>
+
+              {/* Buttons */}
+              <div className="flex justify-end gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setEditingRecord(null)}
+                  className="px-4 py-2 border border-gray-100 rounded-xl font-bold text-xs hover:bg-gray-50 text-gray-600 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={savingEdit}
+                  className="px-6 py-2 bg-primary hover:bg-primary-hover text-white rounded-xl font-bold text-xs shadow-md transition-all flex items-center gap-1.5"
+                >
+                  {savingEdit ? (
+                    <>
+                      <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      <span>Saving...</span>
+                    </>
+                  ) : (
+                    <span>Save Changes</span>
+                  )}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
