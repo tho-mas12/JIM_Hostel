@@ -1085,12 +1085,14 @@ def get_dashboard_summary(current_user):
     records_today = list(db["attendance"].find({"date": today_str}))
     
     type_to_show = "morning"
-    if any(r['type'] == 'night' for r in records_today):
+    if any(r.get('type') == 'night' for r in records_today):
         type_to_show = "night"
         
-    presents = db["attendance"].count_documents({"date": today_str, "type": type_to_show, "status": {"$in": ["Present", "Late Entry"]}})
-    absents = db["attendance"].count_documents({"date": today_str, "type": type_to_show, "status": "Absent"})
-    leaves = db["attendance"].count_documents({"date": today_str, "type": type_to_show, "status": "Leave"})
+    # Filter today's records for active type and aggregate stats in memory
+    filtered_records = [r for r in records_today if r.get('type') == type_to_show]
+    presents = sum(1 for r in filtered_records if r.get('status') in ["Present", "Late Entry"])
+    absents = sum(1 for r in filtered_records if r.get('status') == "Absent")
+    leaves = sum(1 for r in filtered_records if r.get('status') == "Leave")
     
     denom = presents + absents
     pct = round((presents / denom) * 100, 1) if denom > 0 else 100.0
@@ -1098,8 +1100,7 @@ def get_dashboard_summary(current_user):
     total_rooms = db["rooms"].count_documents({})
     
     # Rooms completed count (where at least one student attendance is marked today for current type)
-    records_marked = list(db["attendance"].find({"date": today_str, "type": type_to_show}))
-    rooms_marked = len(set(r["room_number"] for r in records_marked))
+    rooms_marked = len(set(r["room_number"] for r in filtered_records if r.get("room_number")))
     
     # Alerts count
     alerts_count = db["notifications"].count_documents({"status": "Unread"})

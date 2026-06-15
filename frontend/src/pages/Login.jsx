@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import { Lock, User, Eye, EyeOff } from 'lucide-react';
+import API from '../api';
 
 const Login = () => {
   const { login } = useAuth();
@@ -12,6 +13,31 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [isWakingUp, setIsWakingUp] = useState(false);
+
+  useEffect(() => {
+    let isMounted = true;
+    const wakeTimer = setTimeout(() => {
+      if (isMounted) {
+        setIsWakingUp(true);
+      }
+    }, 1500);
+
+    API.get('/health')
+      .then(() => {
+        clearTimeout(wakeTimer);
+        if (isMounted) setIsWakingUp(false);
+      })
+      .catch(() => {
+        clearTimeout(wakeTimer);
+        if (isMounted) setIsWakingUp(false);
+      });
+
+    return () => {
+      isMounted = false;
+      clearTimeout(wakeTimer);
+    };
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -55,6 +81,15 @@ const Login = () => {
         {/* Card Panel */}
         <div className="bg-white rounded-3xl border border-gray-100 shadow-xl p-8">
           <h2 className="font-bold text-gray-800 text-lg mb-6">Sign In to Dashboard</h2>
+          
+          {isWakingUp && (
+            <div className="mb-5 p-3 rounded-xl bg-amber-50 border border-amber-200/60 flex items-start gap-2.5 animate-pulse">
+              <span className="text-amber-500 text-base mt-0.5">⚡</span>
+              <div className="text-[11px] text-amber-800 font-medium leading-relaxed text-left">
+                <span className="font-bold">Server is starting up...</span> Render's free tier spins down after inactivity. Loading the database might take 30-40 seconds.
+              </div>
+            </div>
+          )}
           
           <form onSubmit={handleSubmit} className="space-y-5">
             {/* Username */}

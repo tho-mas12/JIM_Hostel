@@ -277,9 +277,35 @@ class Database:
                 db_name = 'jim_hostel'
             self.db = self.client[db_name]
             print(f"Successfully connected to MongoDB cluster: {db_name}")
+            self._create_indexes()
         except (ConnectionFailure, ServerSelectionTimeoutError, Exception) as e:
             print(f"MongoDB connection failed: {e}. Falling back to local file-based database.")
             self._init_mock()
+
+    def _create_indexes(self):
+        try:
+            # Create indexes on students collection
+            self.db["students"].create_index("register_number")
+            self.db["students"].create_index("room_number")
+            self.db["students"].create_index("status")
+            
+            # Create indexes on attendance collection
+            self.db["attendance"].create_index([("date", 1), ("type", 1)])
+            self.db["attendance"].create_index("student_id")
+            self.db["attendance"].create_index("room_number")
+            
+            # Create indexes on users collection
+            self.db["users"].create_index("username", unique=True)
+            
+            # Create indexes on rooms collection
+            self.db["rooms"].create_index("room_number", unique=True)
+            
+            # Create indexes on notifications collection
+            self.db["notifications"].create_index("status")
+            
+            print("Database indexes ensured successfully.")
+        except Exception as e:
+            print(f"Failed to create indexes: {e}")
 
     def _init_mock(self):
         self.is_mock = True

@@ -1,5 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import API from './api';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { ToastProvider } from './context/ToastContext';
 import Layout from './components/Layout';
@@ -80,6 +81,11 @@ const RootRedirect = () => {
 };
 
 function App() {
+  React.useEffect(() => {
+    // Background wake-up request to eliminate Render cold start times
+    API.get('/health').catch(() => {});
+  }, []);
+
   return (
     <Router>
       <ToastProvider>
