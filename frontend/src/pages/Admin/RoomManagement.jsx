@@ -194,7 +194,7 @@ const RoomManagement = () => {
 
       {/* Add Room Modal */}
       {showAddModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm animate-fade-in px-4">
+        <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/40 backdrop-blur-sm animate-fade-in px-4 pt-16 overflow-y-auto">
           <div className="bg-white rounded-3xl p-6 max-w-md w-full border border-gray-100 shadow-2xl scale-enter">
             <div className="flex justify-between items-center mb-6">
               <h3 className="font-extrabold text-gray-800 text-md">Configure New Room</h3>
@@ -273,7 +273,7 @@ const RoomManagement = () => {
 
       {/* Edit Room Modal */}
       {showEditModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm animate-fade-in px-4">
+        <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/40 backdrop-blur-sm animate-fade-in px-4 pt-16 overflow-y-auto">
           <div className="bg-white rounded-3xl p-6 max-w-md w-full border border-gray-100 shadow-2xl scale-enter">
             <div className="flex justify-between items-center mb-6">
               <h3 className="font-extrabold text-gray-800 text-md">Edit Room details</h3>

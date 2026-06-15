@@ -1,13 +1,1 @@
-[
-  {
-    "_id": "visitor_1",
-    "visitor_name": "Antony Raj (Father)",
-    "student_id": "JIM2026001",
-    "relationship": "Father",
-    "phone_number": "9443552145",
-    "entry_time": "2026-06-11T10:15:00",
-    "exit_time": "2026-06-11T11:30:00",
-    "purpose": "Delivering home food",
-    "created_at": "2026-06-11T10:15:00"
-  }
-]
+[]

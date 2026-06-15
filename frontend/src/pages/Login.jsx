@@ -41,7 +41,7 @@ const Login = () => {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gradient-to-tr from-blue-50 via-gray-50 to-indigo-50 px-4">
+    <div className="flex items-start justify-center min-h-screen bg-gradient-to-tr from-blue-50 via-gray-50 to-indigo-50 px-4 pt-16">
       <div className="w-full max-w-md scale-enter">
         {/* Header Block */}
         <div className="text-center mb-8">

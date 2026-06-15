@@ -290,7 +290,7 @@ const MarkAttendance = () => {
 
       {/* Impressive Success Modal popup overlay */}
       {showSuccessModal && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-sm animate-fade-in px-4">
+        <div className="fixed inset-0 z-[100] flex items-start justify-center bg-black/40 backdrop-blur-sm animate-fade-in px-4 pt-16 overflow-y-auto">
           <div className="bg-white rounded-3xl p-8 max-w-md w-full text-center border border-gray-100 shadow-2xl scale-enter relative overflow-hidden">
             <div className="w-16 h-16 rounded-full bg-emerald-50 border border-emerald-100 text-success flex items-center justify-center mx-auto mb-5 animate-pulse-subtle">
               <CheckCircle2 className="w-10 h-10" />
